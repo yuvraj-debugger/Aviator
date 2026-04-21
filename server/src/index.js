@@ -144,6 +144,11 @@ io.on('connection', (socket) => {
   });
 });
 
+// Serve Frontend
+app.get('*', (req, res) => {
+  res.sendFile(require('path').join(__dirname, '../public/index.html'));
+});
+
 const PORT = 5000;
 sequelize.sync().then(() => {
   engine.init();
