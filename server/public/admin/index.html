@@ -13,6 +13,14 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
+    <script>
+        // Security Guard: Check if user is logged in
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('token');
+        if (!token || !user.isAdmin) {
+            window.location.href = '/';
+        }
+    </script>
 </head>
 <body class="p-10">
     <div class="max-w-6xl mx-auto">
