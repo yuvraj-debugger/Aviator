@@ -13,7 +13,7 @@ const sequelize = process.env.DATABASE_URL
       process.env.DB_PASS || '',
       {
         host: process.env.DB_HOST || 'localhost',
-        dialect: 'mysql', // Explicitly switch to MySQL
+        dialect: process.env.DATABASE_URL?.includes('postgres') ? 'postgres' : 'mysql',
         logging: false
       }
     );
