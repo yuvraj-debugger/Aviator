@@ -22,7 +22,8 @@ router.get('/live', isAdmin, (req, res) => {
       amount: b.amount,
       cashedOut: b.cashedOut
     })),
-    totalRoundBets: engine.gameState.currentBets.reduce((acc, b) => acc + b.amount, 0)
+    totalRoundBets: engine.gameState.currentBets.reduce((acc, b) => acc + b.amount, 0),
+    totalOnline: req.app.get('io').engine.clientsCount
   });
 });
 

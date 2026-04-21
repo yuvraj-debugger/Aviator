@@ -15,7 +15,6 @@ const socket = io({
 const App = () => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [showFullAdmin, setShowFullAdmin] = useState(false);
   const [balance, setBalance] = useState(0);
   const [multiplier, setMultiplier] = useState(1.00);
   const [gameState, setGameState] = useState('WAITING'); 
@@ -149,7 +148,6 @@ const App = () => {
   return (
     <div className="h-screen w-screen flex flex-col bg-[#0f1115] text-[#f3f4f6] overflow-hidden">
       {/* Modals & Dashboard */}
-      {showFullAdmin && <AdminDashboard onBack={() => setShowFullAdmin(false)} />}
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} onAuth={onAuth} />
       <VerifyModal isOpen={showVerify} onClose={() => setShowVerify(false)} roundId={roundId} />
       <AdminPanel isOpen={showAdmin} onClose={() => setShowAdmin(false)} currentBets={currentBets} gameState={gameState} />
@@ -189,7 +187,7 @@ const App = () => {
               </button>
               {user.isAdmin && (
                 <button 
-                  onClick={() => setShowFullAdmin(true)} 
+                  onClick={() => window.open('http://localhost:5000/admin', '_blank')} 
                   className="bg-indigo-500 p-2 rounded-xl hover:bg-indigo-400 transition-all text-white shadow-lg shadow-indigo-500/20"
                 >
                   <Settings size={20} />

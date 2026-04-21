@@ -13,14 +13,6 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
-    <script>
-        // Security Guard: Check if user is logged in
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const token = localStorage.getItem('token');
-        if (!token || !user.isAdmin) {
-            window.location.href = '/';
-        }
-    </script>
 </head>
 <body class="p-10">
     <div class="max-w-6xl mx-auto">
@@ -95,6 +87,33 @@
             </div>
         </div>
         
+        <div class="glass rounded-[2.5rem] p-8 mb-12">
+            <h2 class="text-lg font-bold mb-6 text-gray-400 uppercase tracking-widest flex justify-between">
+                All Registered Players
+                <span id="registeredCount" class="text-xs text-indigo-400">0 Total</span>
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] text-gray-500 uppercase tracking-widest border-b border-white/5">
+                            <th class="pb-4">Username</th>
+                            <th class="pb-4">Current Balance</th>
+                            <th class="pb-4">Role</th>
+                            <th class="pb-4">Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userList" class="text-xs font-bold divide-y divide-white/5">
+                        <tr>
+                            <td colspan="4" class="text-gray-600 text-xs font-bold uppercase py-20 text-center italic">
+                                Authentication Required<br/>
+                                <span class="text-[10px] normal-case opacity-50">Please paste your JWT Token from Port 3000 above to view player data</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="text-center text-[10px] text-gray-600 uppercase tracking-[0.3em]">
             Aviator Node.js Engine &bull; Core Administrative Console
         </div>
@@ -118,9 +137,29 @@
                     document.getElementById('logs').innerText = 'Status: ' + stats.error;
                 } else {
                     document.getElementById('logs').style.display = 'none';
-                    document.getElementById('totalBets').innerText = '$' + stats.totalBets.toFixed(2);
-                    document.getElementById('houseProfit').innerText = '$' + stats.houseProfit.toFixed(2);
+                    document.getElementById('totalBets').innerText = '$' + (stats.totalBets || 0).toFixed(2);
+                    document.getElementById('houseProfit').innerText = '$' + (stats.houseProfit || 0).toFixed(2);
                     document.getElementById('totalUsers').innerText = stats.totalUsers;
+                }
+
+                // All Users
+                const resUsers = await fetch('/api/admin/users', { headers });
+                const users = await resUsers.json();
+                if (!users.error) {
+                    document.getElementById('registeredCount').innerText = users.length + ' Registered';
+                    const uList = document.getElementById('userList');
+                    uList.innerHTML = users.map(u => `
+                        <tr>
+                            <td class="py-4 text-indigo-300 font-black">${u.username}</td>
+                            <td class="py-4 font-black">$${(parseFloat(u.balance) || 0).toFixed(2)}</td>
+                            <td class="py-4">
+                                <span class="px-2 py-0.5 rounded ${u.isAdmin ? 'bg-indigo-500/10 text-indigo-400' : 'bg-gray-500/10 text-gray-500'} text-[9px] uppercase">
+                                    ${u.isAdmin ? 'Admin' : 'Player'}
+                                </span>
+                            </td>
+                            <td class="py-4 text-gray-600 font-bold">${new Date(u.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('');
                 }
 
                 // Live Data
@@ -132,7 +171,7 @@
                     document.getElementById('gameStatusLabel').className = `w-2 h-2 rounded-full animate-pulse ${live.status === 'FLYING' ? 'bg-rose-500' : 'bg-emerald-500'}`;
                     document.getElementById('liveMultiplier').innerText = live.multiplier.toFixed(2) + 'x';
                     document.getElementById('activeStake').innerText = '$' + live.totalRoundBets.toFixed(2);
-                    document.getElementById('playerCount').innerText = live.activeBets.length + ' ONLINE';
+                    document.getElementById('playerCount').innerText = `${live.activeBets.length} BETTING / ${live.totalOnline} ONLINE`;
                     
                     const list = document.getElementById('playerList');
                     if (live.activeBets.length > 0) {
