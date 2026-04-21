@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "install-all": "cd server && npm install && cd ../client && npm install",
-    "build-client": "cd client && npm run build && rm -rf ../server/public/* && cp -r dist/* ../server/public/",
+    "build-client": "cd client && npm run build && find ../server/public -maxdepth 1 ! -name 'admin' ! -name '.' -exec rm -rf {} +; cp -r dist/* ../server/public/",
     "start": "cd server && npm start",
     "dev": "npm run install-all && npm run start"
   }

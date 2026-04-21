@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-app.use('/admin', (req, res, next) => {
+app.get('/admin', (req, res) => {
   res.sendFile(require('path').join(__dirname, '../public/admin/index.html'));
 });
 
