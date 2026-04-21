@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator Admin - Backend Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f1115; color: #f3f4f6; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body class="p-10">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-16">
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-600/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black tracking-tighter uppercase">Backend Monitor</h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <input id="adminToken" type="password" placeholder="Enter Admin Token" class="bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-[10px] w-40 outline-none focus:border-indigo-500 transition-all font-bold text-gray-300">
+                        <button onclick="fetchStats()" class="text-[10px] font-black uppercase text-indigo-400 hover:text-white transition-colors">Apply</button>
+                    </div>
+                </div>
+            </div>
+            <div id="status" class="px-4 py-2 bg-emerald-500/10 text-emerald-500 rounded-xl font-black text-xs uppercase tracking-tighter border border-emerald-500/20 flex items-center gap-2">
+                <span id="gameStatusLabel" class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> <span id="gameStatusText">Service Operational</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div class="glass p-6 rounded-[2rem]">
+                <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Total Volume</p>
+                <p id="totalBets" class="text-2xl font-black">$0.00</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem]">
+                <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">House Profit</p>
+                <p id="houseProfit" class="text-2xl font-black text-rose-400">$0.00</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem]">
+                <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Live Multiplier</p>
+                <p id="liveMultiplier" class="text-2xl font-black text-indigo-400">1.00x</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem]">
+                <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Active Stakes</p>
+                <p id="activeStake" class="text-2xl font-black text-amber-500">$0.00</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div class="glass rounded-[2.5rem] p-8">
+                <h3 class="text-lg font-bold mb-6 text-gray-400 uppercase tracking-widest flex justify-between">
+                    Live Players
+                    <span id="playerCount" class="text-xs text-indigo-400">0</span>
+                </h3>
+                <div id="playerList" class="space-y-3 max-h-80 overflow-y-auto pr-2 min-h-[200px]">
+                    <div class="text-gray-600 text-xs font-bold uppercase py-10 text-center">Enter token to see live data</div>
+                </div>
+            </div>
+
+            <div class="glass rounded-[2.5rem] p-8">
+                <h2 class="text-lg font-bold mb-6 text-gray-400 uppercase tracking-widest">Platform Health</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Registered Users</span>
+                        <span id="totalUsers" class="text-sm font-black">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/5">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Server Port</span>
+                        <span class="text-sm font-black">5000</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Game Loop</span>
+                        <span class="text-sm font-black text-emerald-400 uppercase">Active</span>
+                    </div>
+                    
+                    <div id="logs" class="bg-black/20 p-6 rounded-2xl border border-white/5 text-rose-500 font-bold uppercase text-[10px] tracking-widest leading-loose mt-4">
+                        Status: Authentication Required. Please use the JWT token from the frontend.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-[10px] text-gray-600 uppercase tracking-[0.3em]">
+            Aviator Node.js Engine &bull; Core Administrative Console
+        </div>
+    </div>
+
+    <script>
+        async function fetchStats() {
+            const tokenInput = document.getElementById('adminToken').value;
+            const token = tokenInput || localStorage.getItem('token');
+            if (tokenInput) localStorage.setItem('token', tokenInput);
+
+            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+            
+            try {
+                // Global Stats
+                const resStats = await fetch('/api/admin/stats', { headers });
+                const stats = await resStats.json();
+                
+                if (stats.error) {
+                    document.getElementById('logs').style.display = 'block';
+                    document.getElementById('logs').innerText = 'Status: ' + stats.error;
+                } else {
+                    document.getElementById('logs').style.display = 'none';
+                    document.getElementById('totalBets').innerText = '$' + stats.totalBets.toFixed(2);
+                    document.getElementById('houseProfit').innerText = '$' + stats.houseProfit.toFixed(2);
+                    document.getElementById('totalUsers').innerText = stats.totalUsers;
+                }
+
+                // Live Data
+                const resLive = await fetch('/api/admin/live', { headers });
+                const live = await resLive.json();
+                
+                if (!live.error) {
+                    document.getElementById('gameStatusText').innerText = live.status;
+                    document.getElementById('gameStatusLabel').className = `w-2 h-2 rounded-full animate-pulse ${live.status === 'FLYING' ? 'bg-rose-500' : 'bg-emerald-500'}`;
+                    document.getElementById('liveMultiplier').innerText = live.multiplier.toFixed(2) + 'x';
+                    document.getElementById('activeStake').innerText = '$' + live.totalRoundBets.toFixed(2);
+                    document.getElementById('playerCount').innerText = live.activeBets.length + ' ONLINE';
+                    
+                    const list = document.getElementById('playerList');
+                    if (live.activeBets.length > 0) {
+                        list.innerHTML = live.activeBets.map(b => `
+                            <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center border border-white/5">
+                                <span class="text-xs font-bold">${b.name}</span>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-black ${b.cashedOut ? 'text-emerald-500' : 'text-amber-500'} uppercase">${b.cashedOut ? 'Won' : 'Live'}</p>
+                                    <p class="text-xs font-black">$${b.amount}</p>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        list.innerHTML = '<div class="text-gray-600 text-xs font-bold uppercase py-10 text-center">No active players</div>';
+                    }
+                }
+            } catch (e) {
+                console.error('Fetch error:', e);
+            }
+        }
+        setInterval(fetchStats, 2000);
+        fetchStats();
+    </script>
+</body>
+</html>
